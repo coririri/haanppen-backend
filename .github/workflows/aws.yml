@@ -1,0 +1,66 @@
+name: Deploy to Amazon EC2
+
+on:
+  push:
+    branches: [ "develop", "main" ]
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: setting-jdk17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: test
+        run: ./gradlew clean test
+
+      - name : build
+        run: ./gradlew build
+
+      - name: copy file to Develop server via ssh key
+        if: github.ref == 'refs/heads/develop'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USERNAME }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          source: "build/libs/*"
+          target: "/home/ubuntu/apiserver"
+      - name: copy file to Main server via ssh key
+        if: github.ref == 'refs/heads/main'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.AWS_HOST_DEPLOY }}
+          username: ${{ secrets.AWS_USERNAME_DEPLOY }}
+          key: ${{ secrets.AWS_SSH_KEY_DEPLOY }}
+          source: "build/libs/*"
+          target: "/home/ubuntu/apiserver"
+
+      - name: ssh access to ec2 Develop Server
+        if: github.ref == 'refs/heads/develop'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USERNAME }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          script: |
+            sudo systemctl restart apiserver.service
+      - name: ssh access to ec2 Main Server
+        if: github.ref == 'refs/heads/main'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AWS_HOST_DEPLOY }}
+          username: ${{ secrets.AWS_USERNAME_DEPLOY }}
+          key: ${{ secrets.AWS_SSH_KEY_DEPLOY }}
+          script: |
+            sudo systemctl restart apiserver.service
+            
