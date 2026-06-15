@@ -14,6 +14,10 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 @Component
@@ -31,10 +35,19 @@ public class DataInitializer implements ApplicationRunner {
     @Value("${application.admin.account.password}")
     private String adminPassword;
 
+    @Value("${server.local.storage}")
+    private String storagePath;
+
+    @Value("${server.local.chunk.storage}")
+    private String chunkStoragePath;
+
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
         log.info("Starting data initialization...");
+
+        // 파일 저장소 디렉토리 생성
+        createStorageDirectoriesIfNotExists();
 
         // 관리자 계정 생성
         createAdminAccountIfNotExists();
@@ -88,6 +101,30 @@ public class DataInitializer implements ApplicationRunner {
             log.info("Teachers directory created successfully.");
         } else {
             log.info("Teachers directory already exists. Skipping creation.");
+        }
+    }
+
+    private void createStorageDirectoriesIfNotExists() {
+        try {
+            Path storage = Paths.get(storagePath);
+            Path chunkStorage = Paths.get(chunkStoragePath);
+
+            if (!Files.exists(storage)) {
+                Files.createDirectories(storage);
+                log.info("Created storage directory: {}", storagePath);
+            } else {
+                log.info("Storage directory already exists: {}", storagePath);
+            }
+
+            if (!Files.exists(chunkStorage)) {
+                Files.createDirectories(chunkStorage);
+                log.info("Created chunk storage directory: {}", chunkStoragePath);
+            } else {
+                log.info("Chunk storage directory already exists: {}", chunkStoragePath);
+            }
+        } catch (IOException e) {
+            log.error("Failed to create storage directories", e);
+            throw new RuntimeException("Failed to create storage directories", e);
         }
     }
 }
