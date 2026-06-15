@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @Table(indexes = @Index(name = "idx_media_source", columnList = "src"))
-@SQLDelete(sql = "UPDATE media SET deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE media SET deleted = true WHERE media_id = ?")
 @Where(clause = "deleted = false")
 public class Media {
     @Id
