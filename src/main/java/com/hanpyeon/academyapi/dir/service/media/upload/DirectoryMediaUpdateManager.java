@@ -26,7 +26,12 @@ public class DirectoryMediaUpdateManager {
     @Transactional
     public void update(final ChunkGroupInfo chunkGroupInfo, final String savedPath, final Long memberId) {
         final Directory directory = this.findTargetDirectory(chunkGroupInfo.getDirPath());
-        final Media media = create(chunkGroupInfo.getFileName() + chunkGroupInfo.getExtension(), savedPath, memberId);
+        final String fileName = chunkGroupInfo.getFileName() + chunkGroupInfo.getExtension();
+
+        // 같은 디렉토리에 같은 파일명이 있으면 삭제
+        deleteDuplicateMediaIfExists(directory, fileName);
+
+        final Media media = create(fileName, savedPath, memberId);
         mediaRepository.save(media);
         directory.add(media);
     }
@@ -34,7 +39,12 @@ public class DirectoryMediaUpdateManager {
     @Transactional
     public void update(final ChunkGroupInfo chunkGroupInfo, final Long duration, final String savedPath, final Long memberId, final Long fileSize) {
         final Directory directory = this.findTargetDirectory(chunkGroupInfo.getDirPath());
-        final Media media = create(chunkGroupInfo.getFileName() + chunkGroupInfo.getExtension(), savedPath, memberId, duration, fileSize);
+        final String fileName = chunkGroupInfo.getFileName() + chunkGroupInfo.getExtension();
+
+        // 같은 디렉토리에 같은 파일명이 있으면 삭제
+        deleteDuplicateMediaIfExists(directory, fileName);
+
+        final Media media = create(fileName, savedPath, memberId, duration, fileSize);
         mediaRepository.save(media);
         directory.add(media);
     }
@@ -59,6 +69,16 @@ public class DirectoryMediaUpdateManager {
                 .orElseThrow(() -> new DirectoryException(ErrorCode.NOT_EXIST_DIRECTORY));
         // 업로드 권한 확인로직 추가 필요
         return directory;
+    }
+
+    private void deleteDuplicateMediaIfExists(final Directory directory, final String fileName) {
+        directory.getMedias().stream()
+                .filter(media -> fileName.equals(media.getMediaName()))
+                .findFirst()
+                .ifPresent(existingMedia -> {
+                    mediaRepository.delete(existingMedia);
+                    directory.getMedias().remove(existingMedia);
+                });
     }
 
 }
