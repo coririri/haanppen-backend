@@ -86,7 +86,14 @@ public enum ErrorCode {
 
     BANNER_EXCEPTION(HttpStatus.BAD_REQUEST, "-900", "배너 오류"),
 
-    ONLINE_COURSE_EXCEPTION(HttpStatus.BAD_REQUEST, "-701", "온라인 수업 접근 오류");
+    ONLINE_COURSE_EXCEPTION(HttpStatus.BAD_REQUEST, "-701", "온라인 수업 접근 오류"),
+
+    ILLEGAL_TEST_PAPER_NAME(HttpStatus.BAD_REQUEST, "-1001", "잘못된 시험지 반 이름"),
+    ILLEGAL_TEST_PAPER_STUDENT_STATE(HttpStatus.BAD_REQUEST, "-1002", "사용할 수 없는 학생"),
+    ILLEGAL_TEST_PAPER_STUDENT_SIZE(HttpStatus.BAD_REQUEST, "-1003", "시험지 반 인원 초과"),
+    NO_SUCH_TEST_PAPER(HttpStatus.BAD_REQUEST, "-1004", "시험지 반을 찾을 수 없음"),
+    NOT_FOUND_TEACHER(HttpStatus.BAD_REQUEST, "-1005", "선생님을 찾을 수 없음"),
+    INVALID_TEST_PAPER_ACCESS(HttpStatus.BAD_REQUEST, "-1006", "잘못된 시험지 반 API 접근");
 
     private final HttpStatus httpStatus;
     private final String errorCode;
