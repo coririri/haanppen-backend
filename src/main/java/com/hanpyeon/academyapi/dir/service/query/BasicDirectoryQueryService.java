@@ -47,6 +47,24 @@ class BasicDirectoryQueryService implements DirectoryQueryService {
         return fileViews;
     }
 
+    @Override
+    public List<FileView> queryDirectoryWithoutPermissionCheck(final String directoryPath) {
+        final List<FileView> fileViews = new ArrayList<>();
+        final String resolvedPath = directoryPathFormResolver.resolveToAbsolutePath(directoryPath);
+
+        // 권한 체크 없이 디렉토리 조회
+        final Directory directory = directoryRepository.findDirectoryByPath(resolvedPath)
+                .orElseThrow(() -> new DirectoryException(ErrorCode.NOT_EXIST_DIRECTORY));
+
+        // 미디어 파일 매핑
+        fileViews.addAll(directory.getMedias().stream().map(fileViewMapper::create).toList());
+
+        // 포함된 디렉토리들 불러오기
+        fileViews.addAll(loadDirectories(resolvedPath).stream().map(fileViewMapper::create).toList());
+
+        return fileViews;
+    }
+
     private Directory getDirectory(final String absolutePath, final Long requestMemberId) {
         final Directory directory = directoryRepository.findDirectoryByPath(absolutePath)
                 .orElseThrow(() -> new DirectoryException(ErrorCode.NOT_EXIST_DIRECTORY));

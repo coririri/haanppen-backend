@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface DirectoryQueryService {
     List<FileView> queryDirectory(final QueryDirectoryDto queryDirectoryDto);
+    List<FileView> queryDirectoryWithoutPermissionCheck(final String directoryPath);
 }
