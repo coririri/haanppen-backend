@@ -51,20 +51,18 @@ public class TestPaperLectureController {
     @GetMapping("/lectures/{lectureId}")
     @Operation(summary = "문제집 강의 상세 조회", description = "문제집 강의 ID로 상세 정보를 조회합니다")
     public ResponseEntity<TestPaperLectureResponse> getLecture(
-            @PathVariable final Long lectureId,
-            @AuthenticationPrincipal final MemberPrincipal memberPrincipal
+            @PathVariable final Long lectureId
     ) {
-        final TestPaperLectureResponse response = testPaperLectureService.getLectureById(lectureId, memberPrincipal.memberId());
+        final TestPaperLectureResponse response = testPaperLectureService.getLectureById(lectureId);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{testPaperId}/lecture")
     @Operation(summary = "시험지 반의 문제집 강의 조회", description = "특정 시험지 반의 문제집 강의를 조회합니다")
     public ResponseEntity<TestPaperLectureResponse> getLectureByTestPaper(
-            @PathVariable final Long testPaperId,
-            @AuthenticationPrincipal final MemberPrincipal memberPrincipal
+            @PathVariable final Long testPaperId
     ) {
-        final TestPaperLectureResponse response = testPaperLectureService.getLectureByTestPaperId(testPaperId, memberPrincipal.memberId());
+        final TestPaperLectureResponse response = testPaperLectureService.getLectureByTestPaperId(testPaperId);
         return ResponseEntity.ok(response);
     }
 

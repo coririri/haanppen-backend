@@ -53,19 +53,19 @@ public class TestPaperLectureService {
     }
 
     @Transactional(readOnly = true)
-    public TestPaperLectureResponse getLectureById(final Long lectureId, final Long memberId) {
+    public TestPaperLectureResponse getLectureById(final Long lectureId) {
         final TestPaperLecture lecture = testPaperLectureRepository.findByIdWithTestPaper(lectureId)
                 .orElseThrow(() -> new NoSuchTestPaperLectureException("문제집 강의를 찾을 수 없습니다", ErrorCode.NO_SUCH_TEST_PAPER_LECTURE));
 
-        return toResponse(lecture, memberId);
+        return toResponse(lecture);
     }
 
     @Transactional(readOnly = true)
-    public TestPaperLectureResponse getLectureByTestPaperId(final Long testPaperId, final Long memberId) {
+    public TestPaperLectureResponse getLectureByTestPaperId(final Long testPaperId) {
         final TestPaperLecture lecture = testPaperLectureRepository.findByTestPaperId(testPaperId)
                 .orElseThrow(() -> new NoSuchTestPaperLectureException("문제집 강의를 찾을 수 없습니다", ErrorCode.NO_SUCH_TEST_PAPER_LECTURE));
 
-        return toResponse(lecture, memberId);
+        return toResponse(lecture);
     }
 
     @Transactional
@@ -102,13 +102,13 @@ public class TestPaperLectureService {
         }
     }
 
-    private TestPaperLectureResponse toResponse(final TestPaperLecture lecture, final Long memberId) {
+    private TestPaperLectureResponse toResponse(final TestPaperLecture lecture) {
         List<FileView> videos = Collections.emptyList();
 
         if (lecture.getDirectoryPath() != null && !lecture.getDirectoryPath().isBlank()) {
             try {
-                final QueryDirectoryDto queryDto = new QueryDirectoryDto(lecture.getDirectoryPath(), memberId);
-                videos = directoryQueryService.queryDirectory(queryDto);
+                // 문제집 강의는 해당 반에 속한 학생도 영상을 볼 수 있어야 하므로 권한 체크 없이 조회
+                videos = directoryQueryService.queryDirectoryWithoutPermissionCheck(lecture.getDirectoryPath());
             } catch (Exception e) {
                 // 디렉토리 조회 실패 시 빈 리스트 반환
                 videos = Collections.emptyList();
