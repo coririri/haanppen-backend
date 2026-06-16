@@ -93,7 +93,10 @@ public enum ErrorCode {
     ILLEGAL_TEST_PAPER_STUDENT_SIZE(HttpStatus.BAD_REQUEST, "-1003", "시험지 반 인원 초과"),
     NO_SUCH_TEST_PAPER(HttpStatus.BAD_REQUEST, "-1004", "시험지 반을 찾을 수 없음"),
     NOT_FOUND_TEACHER(HttpStatus.BAD_REQUEST, "-1005", "선생님을 찾을 수 없음"),
-    INVALID_TEST_PAPER_ACCESS(HttpStatus.BAD_REQUEST, "-1006", "잘못된 시험지 반 API 접근");
+    INVALID_TEST_PAPER_ACCESS(HttpStatus.BAD_REQUEST, "-1006", "잘못된 시험지 반 API 접근"),
+
+    TEST_PAPER_LECTURE_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "-1007", "이미 문제집 강의가 존재합니다"),
+    NO_SUCH_TEST_PAPER_LECTURE(HttpStatus.BAD_REQUEST, "-1008", "문제집 강의를 찾을 수 없음");
 
     private final HttpStatus httpStatus;
     private final String errorCode;
